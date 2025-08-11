@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Internal Papers</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1 id="title">Loading...</h1>
+
+  <div id="uploadSection" class="hidden">
+    <input type="file" id="fileInput">
+    <select id="categorySelect">
+      <option value="Internal-Papers 1">Internal-Papers 1</option>
+      <option value="Internal-Papers 2">Internal-Papers 2</option>
+    </select>
+    <button onclick="uploadFile()">Upload</button>
+    <p id="uploadStatus"></p>
+  </div>
+
+  <div class="card-container" id="fileList"></div>
+  <button class="back-button" onclick="history.back()">⬅ Back</button>
+
+  <script>
+    const isAdmin = true;
+
+    const url = new URLSearchParams(window.location.search);
+    const branch = url.get("branch");
+    const semester = url.get("semester");
+    const subject = url.get("subject");
+
+    const categories = [
+      "Internal-Papers 1",
+      "Internal-Papers 2"
+    ];
+
+    document.getElementById("title").textContent = `${subject} - Internal Papers`;
+
+    if (isAdmin) {
+      document.getElementById("uploadSection").classList.remove("hidden");
+    }
+
+    function uploadFile() {
+      const file = document.getElementById("fileInput").files[0];
+      const module = document.getElementById("categorySelect").value;
+      if (!file) return alert("❌ Select a file");
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("branch", branch);
+      formData.append("semester", semester);
+      formData.append("subject", subject);
+      formData.append("module", module);
+
+      fetch("http://localhost:5000/upload", {
+        method: "POST",
+        body: formData
+      }).then(res => res.json()).then(data => {
+        if (data.url) {
+          alert("✅ Upload successful");
+          loadFiles();
+        } else {
+          alert("❌ Upload failed");
+        }
+      });
+    }
+
+    function loadFiles() {
+      const container = document.getElementById("fileList");
+      container.innerHTML = "";
+
+      categories.forEach(module => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `<strong>${module}</strong><br>`;
+
+        fetch(`http://localhost:5000/images?branch=${branch}&semester=${semester}&subject=${subject}&module=${module}`)
+          .then(res => res.json())
+          .then(files => {
+            if (files.length === 0) {
+              div.innerHTML += "<p>📭 No files uploaded.</p>";
+            } else {
+              files.forEach(file => {
+                const fileType = file.split(".").pop().toLowerCase();
+                const fileName = file.split("/").pop();
+
+                if (["jpg", "jpeg", "png", "gif"].includes(fileType)) {
+                  const img = document.createElement("img");
+                  img.src = `http://localhost:5000/${file}`;
+                  div.appendChild(img);
+                } else if (fileType === "pdf") {
+                  const iframe = document.createElement("iframe");
+                  iframe.src = `http://localhost:5000/${file}`;
+                  iframe.height = "300px";
+                  div.appendChild(iframe);
+                }
+
+                const a = document.createElement("a");
+                a.href = `http://localhost:5000/${file}`;
+                a.download = true;
+                a.className = "download-btn";
+                a.textContent = "📥 Download";
+                div.appendChild(a);
+
+                if (isAdmin) {
+                  const delBtn = document.createElement("button");
+                  delBtn.textContent = "🗑️ Delete";
+                  delBtn.style.marginLeft = "10px";
+                  delBtn.onclick = () => {
+                    fetch("http://localhost:5000/delete", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        branch, semester, subject, module,
+                        filename: fileName
+                      })
+                    }).then(res => res.json()).then(result => {
+                      if (result.status === "success") {
+                        alert("✅ File deleted");
+                        loadFiles();
+                      } else {
+                        alert("❌ Delete failed");
+                      }
+                    });
+                  };
+                  div.appendChild(delBtn);
+                }
+              });
+            }
+          });
+
+        container.appendChild(div);
+      });
+    }
+
+    loadFiles();
+  </script>
+</body>
+</html>

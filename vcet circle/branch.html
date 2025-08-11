@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Branch</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Select Branch</h1>
+  <div class="card-container">
+    <script>
+      const section = new URLSearchParams(window.location.search).get('section');
+      const branches = ["CSE", "ECE", "CD", "AI", "ME", "CIVIL"];
+      branches.forEach(branch => {
+        document.write(`<a class="card" href="semester.html?section=${section}&branch=${branch}">${branch}</a>`);
+      });
+    </script>
+  </div>
+  <button class="back-button" onclick="history.back()">⬅ Back</button>
+
+</body>
+</html>

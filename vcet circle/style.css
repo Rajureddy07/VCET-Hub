@@ -1,0 +1,140 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f8;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.card {
+  background-color: #ffffff;
+  border: 2px solid #0077cc;
+  padding: 15px 25px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.1em;
+  color: #0077cc;
+  text-decoration: none;
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background-color: #0077cc;
+  color: white;
+  transform: translateY(-3px);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+iframe {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.download-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.download-btn:hover {
+  background-color: #218838;
+}
+
+.hidden {
+  display: none;
+}
+
+.back-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 10px 18px;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.back-button:hover {
+  background-color: #005fa3;
+}
+
+/* ✅ LAB MANUAL View (Optional Targeted Styling) */
+.lab-manual .card-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.lab-manual h1 {
+  color: #0077cc;
+}
+
+.lab-manual .card {
+  border: 2px dashed #0077cc;
+}
+
+.lab-manual .card:hover {
+  background-color: #e6f3ff;
+  color: #0077cc;
+  transform: scale(1.02);
+}
+
+/* 📱 Responsive for mobile */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.5em;
+  }
+
+  .card {
+    font-size: 1em;
+    padding: 12px 18px;
+  }
+
+  .download-btn {
+    font-size: 0.95em;
+    padding: 8px 12px;
+  }
+
+  iframe {
+    height: 250px;
+  }
+
+  .back-button {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+}

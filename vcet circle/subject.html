@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Subject</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Select Subject</h1>
+  <div class="card-container" id="subject-list"></div>
+  <button class="back-button" onclick="history.back()">⬅ Back</button>
+
+  <script>
+    const url = new URLSearchParams(window.location.search);
+    const section = url.get("section");
+    const branch = url.get("branch");
+    const semester = url.get("semester");
+
+    let subjects = [];
+
+    // ✅ LAB MANUALS
+    if (section === "Lab Manuals") {
+      if (semester === "1") {
+        subjects = ["Physics Manual", "Java Manual", "Mathematics Manual"];
+      } 
+      else if (semester === "2") {
+        subjects = ["Chemistry Manual", "C Manual", "Mathematics"];
+      } 
+      else if (semester === "3") {
+        if (branch === "AI" || branch === "CD") {
+          subjects = ["OS LAB", "DS LAB", "PYTHON LAB", "EXCEL LAB", "DDCO LAB"];
+        } 
+        else if (branch === "CSE") {
+          subjects = ["OS LAB", "DS LAB", "DVP LAB", "DDCO LAB"];
+        }
+        else {
+          subjects = ["Coming Soon"];
+        }
+      }
+      else if (semester === "4") {
+        if (branch === "CD") {
+          subjects = ["ADA LAB", "MongoDB LAB", "DBMS LAB", "MC LAB"];
+        }
+        else if (branch === "CSE") {
+          subjects = ["ADA LAB", "LATEX LAB", "DBMS LAB", "MC LAB"];
+        }
+        else if (branch === "AI") {
+          subjects = ["ADA LAB", "MongoDB LAB", "DBMS LAB", "AI LAB"];
+        }
+        else {
+          subjects = ["Coming Soon"];
+        }
+      }
+      else {
+        subjects = ["Coming Soon"];
+      }
+    }
+
+    // ✅ NOTES / QUESTION PAPERS / INTERNAL PAPERS
+    else {
+      if (semester === "1") {
+        subjects = [
+          "Mathematics-I",
+          "Applied Chemistry",
+          "Basics of JAVA Programming",
+          "Basic Electrical Engineering",
+          "Communicative English",
+          "Indian Constitution",
+          "Scientific Foundations of Health"
+        ];
+      }
+      else if (semester === "2") {
+        subjects = [
+          "Introduction to Electrical Engineering",
+          "Introduction to Internet of Things (IOT)",
+          "Innovation and Design Thinking",
+          "Balake Kannada",
+          "Samskrutika Kannada",
+          "Mathematics-II",
+          "Applied Physics",
+          "Principles of Programming using C",
+          "Professional Writing Skills in English"
+        ];
+      }
+      else if (semester === "3") {
+        if (branch === "AI" || branch === "CD") {
+          subjects = [
+            "Mathematics",
+            "Digital Design & Computer Organization",
+            "Operating Systems",
+            "Data Structures and Applications",
+            "Python Programming"
+          ];
+        }
+        else if (branch === "CSE") {
+          subjects = [
+            "Mathematics for Computer Science",
+            "Digital Design & Computer Organization",
+            "Operating Systems",
+            "Data Structures and Applications",
+            "Object Oriented Programming with C++"
+          ];
+        }
+        else if (branch === "ECE") {
+          subjects = [
+            "AV Mathematics-III for EC Engineering",
+            "Digital System Design using Verilog",
+            "Electronic Principles and Circuits",
+            "Network Analysis",
+            "Computer Organization and Architecture"
+          ];
+        }
+        else {
+          subjects = ["Coming Soon"];
+        }
+      }
+      else if (semester === "4") {
+        if (branch === "ECE") {
+          subjects = [
+            "Electromagnetics Theory",
+            "Principles of Communication Systems",
+            "Control Systems",
+            "Microcontrollers",
+            "Biology For Engineers",
+            "Universal Human Values Course"
+          ];
+        }
+        else if (branch === "CSE" || branch === "CD" || branch === "AI") {
+          subjects = [
+            "Biology",
+            "Analysis and Design of Algorithms",
+            "Microcontrollers",
+            "Database Management Systems",
+            "Discrete Mathematical Structures",
+            "Universal Human Values"
+          ];
+        }
+        else {
+          subjects = ["Coming Soon"];
+        }
+      }
+      else {
+        subjects = ["Coming Soon"];
+      }
+    }
+
+    // ✅ Render subjects
+    const list = document.getElementById("subject-list");
+    subjects.forEach(subject => {
+      const a = document.createElement("a");
+      a.className = "card";
+      a.textContent = subject;
+
+      let nextPage = "";
+      if (section === "Notes") {
+        nextPage = `module-select.html`;
+      } else if (section === "Question Papers") {
+        nextPage = `question-view.html`;
+      } else if (section === "Internal Papers") {
+        nextPage = `internal-view.html`;
+      } else if (section === "Lab Manuals") {
+        nextPage = `lab-view.html`; // ✅ direct skip for lab manuals
+      } else {
+        nextPage = `module-select.html`; // fallback
+      }
+
+      a.href = `${nextPage}?section=${section}&branch=${branch}&semester=${semester}&subject=${encodeURIComponent(subject)}`;
+      list.appendChild(a);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Module</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Select Module</h1>
+  <div class="card-container" id="module-list"></div>
+
+  <script>
+    const url = new URLSearchParams(window.location.search);
+    const section = url.get("section");
+    const branch = url.get("branch");
+    const semester = url.get("semester");
+    const subject = url.get("subject");
+
+    const list = document.getElementById("module-list");
+
+    for (let i = 1; i <= 5; i++) {
+      const a = document.createElement("a");
+      a.className = "card";
+      a.textContent = `Module ${i}`;
+      a.href = `module-view.html?section=${section}&branch=${branch}&semester=${semester}&subject=${encodeURIComponent(subject)}&module=Module${i}`;
+      list.appendChild(a);
+    }
+  </script>
+  <button class="back-button" onclick="history.back()">⬅ Back</button>
+
+</body>
+</html>

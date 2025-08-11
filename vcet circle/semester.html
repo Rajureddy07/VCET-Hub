@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Semester</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Select Semester</h1>
+  <div class="card-container">
+    <script>
+      const url = new URLSearchParams(window.location.search);
+      const section = url.get('section');
+      const branch = url.get('branch');
+
+      for (let i = 1; i <= 8; i++) {
+        document.write(`<a class="card" href="subject.html?section=${section}&branch=${branch}&semester=${i}">${i} Semester</a>`);
+      }
+    </script>
+  </div>
+  <button class="back-button" onclick="history.back()">⬅ Back</button>
+
+</body>
+</html>
