@@ -2,145 +2,484 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Module Files</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1 id="title">Loading...</h1>
+  <title>VCET Hub - Module View</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #0c0c0c;
+      color: #f0f0f0;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    h1 {
+      margin: 0;
+      background: #161616;
+      padding: 12px;
+      border-radius: 10px;
+      flex: 1;
+    }
+    .home-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 20px;
+      height: 50px;
+    }
+    h2 {
+      text-align: center;
+      background: #161616;
+      padding: 12px;
+      border-radius: 10px;
+    }
+    .section {
+      border: 2px solid #3c3c3c;
+      background: #161616;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 30px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 8px;
+      transition: 0.2s;
+    }
+    .btn-upload { background: #28a745; color: #fff; }
+    .btn-upload:hover { background: #34ce57; }
+    .btn-convert { background: #007bff; color: #fff; }
+    .btn-convert:hover { background: #339cff; }
+    .btn-delete { background: #dc3545; color: #fff; }
+    .btn-delete:hover { background: #ff4757; }
+    .btn-download { background: #0056b3; color: #fff; }
+    .btn-download:hover { background: #007bff; }
+    .preview-box {
+      border: 2px solid #444;
+      background: #111;
+      border-radius: 2px;
+      padding: 10px;
+      max-height: 500px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    canvas, img, iframe {
+      width: 100%;      /* always full width */
+      max-width: 900px; /* keep large on desktop */
+      margin: 10px auto;
+      border: 1px solid #666;
+      border-radius: 6px;
+      display: block;
+    }
 
-  <!-- Upload Section (admin only) -->
-  <div id="uploadSection" class="hidden">
+    textarea {
+      width: 100%;
+      max-width: 800px;
+      height: 400px;
+      display: block;
+      margin: 15px auto;
+      padding: 12px;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #000;
+      font-size: 22px;
+      font-weight: bold;
+      line-height: 1.9;
+      font-family: "Times New Roman", Times, serif;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+    .file-box {
+      background: #1a1a1a;
+      padding: 15px;
+      border: 1px solid #333;
+      border-radius: 10px;
+      margin: 15px auto;
+      text-align: center;
+      width: 90%;
+      max-width: 1200px;
+    }
+    .file-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .back-btn {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      background: #6c757d;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #progress {
+      text-align: center;
+      color: #ccc;
+      font-size: 14px;
+    }
+    /* Reference links & comments */
+    .link-box {
+      border: 1px solid #007BFF;
+      padding: 20px;
+      border-radius: 10px;
+      background: #161616;
+      margin-top: 30px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      color: #e0e0e0;
+    }
+    .link-box h3 { color: #66ccff; margin-bottom: 15px; }
+    .link-input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: #0f0f0f;
+      color: white;
+    }
+    .save-btn, .delete-btn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .save-btn { background: #28a745; color: white; }
+    .delete-btn { background: #dc3545; color: white; margin-left: 10px; }
+    #commentsSection {
+      max-width: 700px;
+      margin: 30px auto;
+      background: #161616;
+      padding: 20px;
+      border-radius: 10px;
+      color: #e0e0e0;
+    }
+    #commentsSection h3 { color: #66ccff; }
+    .comment { border-bottom: 1px solid #333; padding: 10px 0; text-align: left; }
+    .comment-header { display: flex; align-items: center; }
+    .comment img { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #ccc; margin-right: 10px; }
+    .comment strong { color: #fff; }
+    .comment span { color: gray; font-size: 12px; margin-left: 5px; }
+    .comment p { margin: 8px 0 0 45px; color: #ddd; }
+    .comment-form textarea, .comment-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: #0f0f0f;
+      color: white;
+    }
+    .comment-form button {
+      background: #6f42c1;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      canvas, img, iframe {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+
+<body>
+  <div class="header">
+    <h1 id="title"></h1>
+    <button class="home-btn" onclick="location.href='index.html'">🏠 Home</button>
+  </div>
+
+  <!-- Upload Section (Admin only) -->
+  <div id="uploadSection" class="section" style="display:none;">
+    <h2>📤 Upload Notes / Files</h2>
     <input type="file" id="fileInput">
-    <button onclick="uploadFile()">Upload</button>
+    <button class="btn btn-upload" onclick="uploadFile()">Upload</button>
     <p id="uploadStatus"></p>
   </div>
 
-  <div class="card-container" id="fileList"></div>
-  <button class="back-button" onclick="history.back()">⬅ Back</button>
+  <!-- Converter Section -->
+  <div id="converterSection" class="section" style="display:none;">
+    <h2>✍ Handwritten PDF/Image → Text Converter</h2>
+    <input type="file" id="convertInput" accept="image/*,application/pdf">
+    <button class="btn btn-upload" onclick="loadForConversion()">Load File</button>
+    <div id="previewBox" class="preview-box"></div>
+    <button class="btn btn-convert" onclick="convertToText()">Convert to Text</button>
+    <div id="progress"></div>
+    <textarea id="convertedText" placeholder="Converted text will appear here..." style="display:none;"></textarea>
+    <button id="uploadConvertedBtn" class="btn btn-upload" style="display:none;" onclick="uploadConvertedText()">⬆ Upload Converted Text</button>
+  </div>
+
+  <!-- Uploaded Files -->
+  <div id="fileList" class="section">
+    <h2>📚 Uploaded Files</h2>
+  </div>
+
+  <!-- Reference Links -->
+  <div id="referenceBox" class="link-box">
+    <h3>🔗 Reference Links</h3>
+    <div id="linkInputs" style="display:none;">
+      <input class="link-input" id="commentInput" placeholder="Enter reference title">
+      <input class="link-input" id="linkInput" placeholder="Enter link (e.g. YouTube / website)">
+      <button class="save-btn" onclick="saveLink()">Add Link</button>
+    </div>
+    <div id="linkList"><p>No reference links yet.</p></div>
+  </div>
+
+  <!-- Comments -->
+  <div id="commentsSection">
+    <h3>💬 Comments</h3>
+    <div id="commentList">No comments yet.</div>
+    <h3>📝 Write a Comment</h3>
+    <div class="comment-form">
+      <textarea id="userComment" placeholder="Write your comment..."></textarea>
+      <input id="userName" type="text" placeholder="Your Name">
+      <input id="userEmail" type="email" placeholder="Your Email">
+      <button onclick="postComment()">Post Comment</button>
+    </div>
+  </div>
+
+  <button class="back-btn" onclick="history.back()">⬅ Back</button>
 
   <script>
-    const isAdmin = false; // set false to hide upload/delete
-
     const url = new URLSearchParams(window.location.search);
-    const branch = url.get("branch");
-    const semester = url.get("semester");
-    const subject = url.get("subject");
-    const module = url.get("module");
-
+    const branch = url.get("branch"), semester = url.get("semester"), subject = url.get("subject"), module = url.get("module");
     document.getElementById("title").textContent = `${subject} - ${module}`;
+    const moduleKey = `${branch}_${semester}_${subject}_${module}`;
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    let loadedFile = null;
 
     if (isAdmin) {
-      document.getElementById("uploadSection").classList.remove("hidden");
+      document.getElementById("uploadSection").style.display = "block";
+      document.getElementById("converterSection").style.display = "block";
+      document.getElementById("linkInputs").style.display = "block";
     }
 
-    function uploadFile() {
+    async function loadFiles() {
+      const res = await fetch(`http://127.0.0.1:5000/images?branch=${branch}&semester=${semester}&subject=${subject}&module=${module}`);
+      const files = await res.json();
+      const list = document.getElementById("fileList");
+      list.innerHTML = "<h2>📚 Uploaded Files</h2>";
+      if (!files.length) return list.innerHTML += "<p>No files uploaded yet.</p>";
+
+      for (const f of files) {
+        const div = document.createElement("div");
+        div.className = "file-box";
+        const file = f.file;
+        const name = file.split("/").pop();
+        const ext = name.split(".").pop().toLowerCase();
+
+        if (ext === "txt") {
+          const resp = await fetch(`http://127.0.0.1:5000/${file}`);
+          const text = await resp.text();
+          div.innerHTML = `<h3>📝 ${name}</h3><textarea readonly>${text}</textarea>`;
+        } else if (ext === "pdf") {
+          div.innerHTML = `<iframe src="http://127.0.0.1:5000/${file}" width="100%" height="550px"></iframe>`;
+        } else {
+          div.innerHTML = `<img src="http://127.0.0.1:5000/${file}" width="100%">`;
+        }
+
+        const btns = document.createElement("div");
+        btns.className = "file-buttons";
+        const download = document.createElement("button");
+        download.className = "btn btn-download";
+        download.textContent = "⬇ Download";
+        download.onclick = () => window.open(`http://127.0.0.1:5000/${file}`);
+        btns.appendChild(download);
+
+        if (isAdmin) {
+          const del = document.createElement("button");
+          del.className = "btn btn-delete";
+          del.textContent = "🗑 Delete";
+          del.onclick = () => deleteFile(name);
+          btns.appendChild(del);
+        }
+
+        div.appendChild(btns);
+        list.appendChild(div);
+      }
+    }
+
+    async function uploadFile() {
       const file = document.getElementById("fileInput").files[0];
-      if (!file) return alert("Please select a file");
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("branch", branch);
-      formData.append("semester", semester);
-      formData.append("subject", subject);
-      formData.append("module", module);
-
-      fetch("http://localhost:5000/upload", {
-        method: "POST",
-        body: formData
-      }).then(res => res.json())
-        .then(data => {
-          if (data.url) {
-            alert("✅ Upload successful");
-            loadFiles();
-          } else {
-            alert("❌ Upload failed");
-          }
-        }).catch(() => alert("❌ Server error"));
+      if (!file) return alert("Select a file first!");
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("branch", branch);
+      fd.append("semester", semester);
+      fd.append("subject", subject);
+      fd.append("module", module);
+      const res = await fetch("http://127.0.0.1:5000/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      alert(data.message);
+      loadFiles();
     }
 
-    function loadFiles() {
-      fetch(`http://localhost:5000/images?branch=${branch}&semester=${semester}&subject=${subject}&module=${module}`)
-        .then(res => res.json())
-        .then(files => {
-          const list = document.getElementById("fileList");
-          list.innerHTML = "";
+   async function deleteFile(filename) {
+  if (!confirm("Delete this file?")) return;
 
-          if (files.length === 0) {
-            list.textContent = "📭 No files uploaded yet.";
-            return;
-          }
+  try {
+    const res = await fetch("http://127.0.0.1:5000/delete_file", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ branch, semester, subject, module, filename })
+    });
 
-          files.forEach(file => {
-            const card = document.createElement("div");
-            card.className = "card";
-            const fileType = file.split('.').pop().toLowerCase();
+    const result = await res.json();
 
-            // Show preview
-            if (["jpg", "jpeg", "png", "gif"].includes(fileType)) {
-              const img = document.createElement("img");
-              img.src = `http://localhost:5000/${file}`;
-              card.appendChild(img);
-            } else if (fileType === "pdf") {
-              const iframe = document.createElement("iframe");
-              iframe.src = `http://localhost:5000/${file}`;
-              iframe.height = "300px";
-              iframe.width = "100%";
-              card.appendChild(iframe);
-            }
+    if (result.success) {
+      alert("✅ File deleted successfully!");
+      loadFiles(); // refresh file list
+    } else {
+      alert("❌ Failed to delete file on server.");
+      console.error(result.error);
+    }
+  } catch (err) {
+    console.error("Delete error:", err);
+    alert("⚠️ Error deleting file.");
+  }
+}
 
-            // Download link
-            const downloadLink = document.createElement("a");
-            downloadLink.href = `http://localhost:5000/${file}`;
-            downloadLink.textContent = "📥 Download";
-            downloadLink.className = "download-btn";
-            downloadLink.download = true;
-            card.appendChild(downloadLink);
 
-            // Delete button (admin only)
-            if (isAdmin) {
-              const deleteBtn = document.createElement("button");
-              deleteBtn.textContent = "🗑️ Delete";
-              deleteBtn.style.marginLeft = "10px";
-              deleteBtn.style.backgroundColor = "#dc3545";
-              deleteBtn.style.color = "#fff";
-              deleteBtn.style.padding = "6px 12px";
-              deleteBtn.style.border = "none";
-              deleteBtn.style.borderRadius = "6px";
-              deleteBtn.style.cursor = "pointer";
+    function loadForConversion() {
+      const file = document.getElementById("convertInput").files[0];
+      if (!file) return alert("Select file first!");
+      loadedFile = file;
+      const url = URL.createObjectURL(file);
+      const box = document.getElementById("previewBox");
+      box.innerHTML = file.type === "application/pdf"
+        ? `<iframe src="${url}" width="100%" height="500px"></iframe>`
+        : `<img src="${url}" width="90%">`;
+    }
 
-              deleteBtn.onclick = () => {
-                if (confirm("Are you sure you want to delete this file?")) {
-                  fetch("http://localhost:5000/delete", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      branch: branch,
-                      semester: semester,
-                      subject: subject,
-                      module: module,
-                      filename: file.split("/").pop()
-                    })
-                  }).then(res => res.json())
-                    .then(result => {
-                      if (result.status === "success") {
-                        alert("✅ File deleted");
-                        loadFiles();
-                      } else {
-                        alert("❌ Failed to delete");
-                      }
-                    });
-                }
-              };
+    async function convertToText() {
+      if (!loadedFile) return alert("No file loaded!");
+      const { data } = await Tesseract.recognize(loadedFile, "eng", {
+        logger: e => document.getElementById("progress").innerText = `Progress: ${(e.progress * 100).toFixed(1)}%`
+      });
+      const textArea = document.getElementById("convertedText");
+      textArea.style.display = "block";
+      textArea.value = data.text.trim();
+      document.getElementById("uploadConvertedBtn").style.display = "inline-block";
+    }
 
-              card.appendChild(deleteBtn);
-            }
+    async function uploadConvertedText() {
+      const text = document.getElementById("convertedText").value.trim();
+      if (!text) return alert("No text to upload!");
+      const blob = new Blob([text], { type: "text/plain" });
+      const fd = new FormData();
+      fd.append("file", blob, "converted_text.txt");
+      fd.append("branch", branch);
+      fd.append("semester", semester);
+      fd.append("subject", subject);
+      fd.append("module", module);
+      const res = await fetch("http://127.0.0.1:5000/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      alert(data.message);
+      loadFiles();
+    }
 
-            list.appendChild(card);
-          });
-        });
+    function loadLinks() {
+      const links = JSON.parse(localStorage.getItem(`module_links_${moduleKey}`) || "[]");
+      const list = document.getElementById("linkList");
+      list.innerHTML = links.length ? "" : "<p>No reference links yet.</p>";
+      links.forEach((l, i) => {
+        const div = document.createElement("div");
+        div.innerHTML = `<p>👉 ${l.comment} <a href="${l.link}" target="_blank">🔗 Open</a></p>`;
+        if (isAdmin) {
+          const del = document.createElement("button");
+          del.className = "delete-btn";
+          del.textContent = "🗑 Delete";
+          del.onclick = () => deleteLink(i);
+          div.appendChild(del);
+        }
+        list.appendChild(div);
+      });
+    }
+
+    function saveLink() {
+      const c = document.getElementById("commentInput").value.trim();
+      const l = document.getElementById("linkInput").value.trim();
+      if (!c || !l) return alert("Enter both fields!");
+      const links = JSON.parse(localStorage.getItem(`module_links_${moduleKey}`) || "[]");
+      links.push({ comment: c, link: l });
+      localStorage.setItem(`module_links_${moduleKey}`, JSON.stringify(links));
+      document.getElementById("commentInput").value = "";
+      document.getElementById("linkInput").value = "";
+      loadLinks();
+    }
+
+    function deleteLink(i) {
+      const links = JSON.parse(localStorage.getItem(`module_links_${moduleKey}`) || "[]");
+      links.splice(i, 1);
+      localStorage.setItem(`module_links_${moduleKey}`, JSON.stringify(links));
+      loadLinks();
+    }
+
+    function loadComments() {
+      const comments = JSON.parse(localStorage.getItem(`module_comments_${moduleKey}`) || "[]");
+      const list = document.getElementById("commentList");
+      list.innerHTML = comments.length ? "" : "<p>No comments yet.</p>";
+      comments.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "comment";
+        div.innerHTML = `
+          <div class="comment-header">
+            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+            <div><strong>${c.name}</strong><span>${c.date}</span></div>
+          </div>
+          <p>${c.text}</p>`;
+        list.appendChild(div);
+      });
+    }
+
+    function postComment() {
+      const text = document.getElementById("userComment").value.trim();
+      const name = document.getElementById("userName").value.trim();
+      const email = document.getElementById("userEmail").value.trim();
+      if (!text || !name || !email) return alert("Fill all fields!");
+      const comments = JSON.parse(localStorage.getItem(`module_comments_${moduleKey}`) || "[]");
+      comments.unshift({ text, name, email, date: new Date().toLocaleString() });
+      localStorage.setItem(`module_comments_${moduleKey}`, JSON.stringify(comments));
+      document.getElementById("userComment").value = "";
+      document.getElementById("userName").value = "";
+      document.getElementById("userEmail").value = "";
+      loadComments();
     }
 
     loadFiles();
+    loadLinks();
+    loadComments();
   </script>
 </body>
 </html>

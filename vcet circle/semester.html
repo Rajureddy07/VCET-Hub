@@ -4,21 +4,90 @@
   <meta charset="UTF-8">
   <title>Select Semester</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Header styling with centered title */
+    header {
+      position: relative;
+      background-color: #111;
+      color: #00d4ff;
+      padding: 15px 20px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center; /* centers the title */
+      border-bottom: 1px solid #333;
+    }
+
+    /* Home button styling with increased width */
+    .top-btn {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      font-size: medium;
+      transform: translateY(-50%);
+      width: 120px; /* width of the button */
+      padding: 10px 16px;
+      background-color: #00d4ff;
+      color: #111;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .top-btn:hover {
+      transform: translateY(-50%) translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 212, 255, 0.5);
+    }
+    /* Mobile Responsive Fix */
+@media (max-width: 600px) {
+
+  /* Make header text & spacing adjust */
+  header {
+    font-size: 1.4rem;
+    padding: 12px 10px;
+  }
+
+  /* Home button becomes smaller + stays inside */
+  .top-btn {
+    width: 90px;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    right: 10px;
+  }
+
+  /* Back button becomes flexible */
+  .back-button {
+    font-size: 1rem;
+    width: 20%;
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+}
+
+  </style>
 </head>
 <body>
-  <h1>Select Semester</h1>
-  <div class="card-container">
-    <script>
-      const url = new URLSearchParams(window.location.search);
-      const section = url.get('section');
-      const branch = url.get('branch');
 
-      for (let i = 1; i <= 8; i++) {
-        document.write(`<a class="card" href="subject.html?section=${section}&branch=${branch}&semester=${i}">${i} Semester</a>`);
-      }
-    </script>
-  </div>
-  <button class="back-button" onclick="history.back()">⬅ Back</button>
+<!-- Header with centered title and Home button -->
+<header>
+  Select Semester
+  <button onclick="window.location.href='index.html'" class="top-btn">Home</button>
+</header>
+
+<div class="card-container">
+  <script>
+    const url = new URLSearchParams(window.location.search);
+    const section = url.get('section');
+    const branch = url.get('branch');
+
+    for (let i = 1; i <= 8; i++) {
+      document.write(`<a class="card" href="subject.html?section=${section}&branch=${branch}&semester=${i}">${i} Semester</a>`);
+    }
+  </script>
+</div>
+
+<button class="back-button" onclick="history.back()">⬅ Back</button>
 
 </body>
 </html>

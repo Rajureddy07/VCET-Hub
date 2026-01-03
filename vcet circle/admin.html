@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Login - VCET Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    background: linear-gradient(135deg, #0e0e0e, #1c1c1c);
+    font-family: 'Poppins', sans-serif;
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .login-container {
+    background: #1f1f1f;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.7),
+                inset 0 0 12px rgba(255,255,255,0.05);
+    text-align: center;
+    width: 320px;
+  }
+
+  .login-container h2 {
+    margin-bottom: 25px;
+    color: #00d4ff;
+    font-size: 1.8rem;
+    text-shadow: 0 0 8px #00d4ff;
+  }
+
+  .login-container input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #0e0e0e;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s;
+  }
+
+  .login-container input:focus {
+    border: 1px solid #00d4ff;
+  }
+
+  .login-container button {
+    background-color: #00d4ff;
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    width: 50%;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .login-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,212,255,0.4);
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #00d4ff;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>Admin Login</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <br>
+  <a href="index.html" class="back-link">← Back to Home</a>
+</div>
+
+<script>
+function login() {
+  const user = document.getElementById("username").value.trim();
+  const pass = document.getElementById("password").value.trim();
+
+  // Replace with your admin credentials
+  if(user === "vcet" && pass === "vcet123") {
+    alert("✅ Login Successful!");
+    localStorage.setItem("isAdmin", "true");
+    window.location.href = "index.html"; // Redirect to main page
+  } else {
+    alert("❌ Invalid credentials. Try again.");
+  }
+}
+</script>
+
+</body>
+</html>

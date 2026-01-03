@@ -2,142 +2,290 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Lab Manual Files</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Lab Manuals</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #050505;
+      color: #e0e0e0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      background: #333;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .file-box {
+      border: 2px solid #f2f6f3;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      background: #3b3b3b;
+      color: black;
+    }
+
+    .preview-box {
+      border: 3px solid #eef2ef;
+      border-radius: 8px;
+      background: #f9f9f9;
+      width: 100%;
+      max-width: 500px;
+      max-height: 70vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      margin: 0 auto 12px auto;
+    }
+
+    .preview-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    canvas {
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      max-width: 90%;
+      height: auto;
+      display: block;
+    }
+
+    .download-container {
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .download-btn {
+      padding: 10px 20px;
+      background: #007BFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .download-btn:hover {
+      background: #0056b3;
+    }
+
+    .delete-btn {
+      margin-top: 6px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #dc3545;
+      color: white;
+      margin-left: 10px;
+    }
+
+    .back-button {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      background: #6c757d;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
 </head>
+
 <body>
+
   <h1 id="title">Loading...</h1>
 
-  <!-- Upload Section (admin only) -->
+  <!-- Upload Section (Admin Only) -->
   <div id="uploadSection" class="hidden">
     <input type="file" id="fileInput">
     <button onclick="uploadFile()">Upload</button>
     <p id="uploadStatus"></p>
   </div>
 
+  <!-- Uploaded Files -->
   <div class="card-container" id="fileList"></div>
 
   <button class="back-button" onclick="history.back()">⬅ Back</button>
 
   <script>
-    const isAdmin = true ; // change to true for admin access
 
+    /* ---------------------- PAGE SETUP ---------------------- */
     const url = new URLSearchParams(window.location.search);
     const branch = url.get("branch");
     const semester = url.get("semester");
     const subject = url.get("subject");
+    const module = url.get("module");
 
-    document.getElementById("title").textContent = `${subject}`;
+    // Fix "null Lab Manual"
+    let cleanModule = module && module !== "null" ? module : "";
+    document.getElementById("title").textContent =
+      cleanModule ? `${subject} - ${cleanModule} Lab Manual` : `${subject} Lab Manual`;
 
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
     if (isAdmin) {
       document.getElementById("uploadSection").classList.remove("hidden");
     }
 
+    /* ---------------------- UPLOAD FILE ---------------------- */
     function uploadFile() {
-      const file = document.getElementById("fileInput").files[0];
-      if (!file) return alert("Please select a file");
+      const fileInput = document.getElementById("fileInput");
+      if (!fileInput.files.length) return alert("⚠ Please choose a file!");
+
+      if (!confirm("Upload this file?")) return;
 
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", fileInput.files[0]);
       formData.append("branch", branch);
       formData.append("semester", semester);
       formData.append("subject", subject);
+      formData.append("module", module);
 
-      fetch("http://localhost:5000/upload", {
-        method: "POST",
-        body: formData
-      }).then(res => res.json())
+      fetch("http://localhost:5000/upload", { method: "POST", body: formData })
+        .then(res => res.json())
         .then(data => {
-          if (data.url) {
-            alert("✅ Upload successful");
-            loadFiles();
-          } else {
-            alert("❌ Upload failed");
-          }
-        }).catch(() => alert("❌ Server error"));
+          alert(data.message || "Uploaded!");
+          fileInput.value = "";
+          loadFiles();
+        })
+        .catch(err => alert("Upload error: " + err.message));
     }
 
+    /* ---------------------- RENDER PDF ---------------------- */
+    function renderPDF(url, container) {
+      const pdfjsLib = window["pdfjs-dist/build/pdf"];
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js";
+
+      container.innerHTML = "";
+
+      pdfjsLib.getDocument(url).promise.then(pdfDoc => {
+        for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+          pdfDoc.getPage(pageNum).then(page => {
+            const viewport = page.getViewport({ scale: 1.2 });
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            page.render({ canvasContext: ctx, viewport }).promise.then(() => {
+              container.appendChild(canvas);
+            });
+          });
+        }
+      });
+    }
+
+    /* ---------------------- DELETE FILE ---------------------- */
+    function deleteFile(filename) {
+      if (!confirm("⚠ Delete this file?")) return;
+
+      // FIX: Lab manuals do not have module → assign default module
+      const safeModule =
+        module && module !== "null" && module !== "undefined" && module !== ""
+          ? module
+          : "Lab-Manual";
+
+      fetch("http://localhost:5000/delete_file", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          branch,
+          semester,
+          subject,
+          module: safeModule,
+          filename
+        })
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert(data.message);
+          loadFiles();
+        })
+        .catch((err) => alert("Error deleting: " + err.message));
+    }
+
+
+    /* ---------------------- LOAD FILES ---------------------- */
     function loadFiles() {
-      fetch(`http://localhost:5000/images?branch=${branch}&semester=${semester}&subject=${subject}`)
+      fetch(`http://localhost:5000/images?branch=${branch}&semester=${semester}&subject=${subject}&module=${module}`)
         .then(res => res.json())
         .then(files => {
           const list = document.getElementById("fileList");
           list.innerHTML = "";
 
-          if (files.length === 0) {
-            list.textContent = "📭 No files uploaded yet.";
+          if (!files.length) {
+            list.textContent = "📭 No Lab Manuals uploaded.";
             return;
           }
 
-          files.forEach(file => {
-            const card = document.createElement("div");
-            card.className = "card";
+          files.forEach(entry => {
+            const file = entry.file;
+            const type = file.split(".").pop().toLowerCase();
 
-            const fileType = file.split('.').pop().toLowerCase();
+            const container = document.createElement("div");
+            container.className = "file-box";
 
-            if (["jpg", "jpeg", "png"].includes(fileType)) {
+            const previewBox = document.createElement("div");
+            previewBox.className = "preview-box";
+
+            const previewContent = document.createElement("div");
+            previewContent.className = "preview-content";
+
+            if (["jpg", "jpeg", "png"].includes(type)) {
               const img = document.createElement("img");
               img.src = `http://localhost:5000/${file}`;
-              card.appendChild(img);
-            } else if (fileType === "pdf") {
-              const iframe = document.createElement("iframe");
-              iframe.src = `http://localhost:5000/${file}`;
-              iframe.height = "300px";
-              iframe.width = "100%";
-              card.appendChild(iframe);
+              previewContent.appendChild(img);
+            } else if (type === "pdf") {
+              renderPDF(`http://localhost:5000/${file}`, previewContent);
             }
 
-            const downloadLink = document.createElement("a");
-            downloadLink.href = `http://localhost:5000/${file}`;
-            downloadLink.textContent = "📥 Download";
-            downloadLink.className = "download-btn";
-            downloadLink.download = true;
-            card.appendChild(downloadLink);
+            previewBox.appendChild(previewContent);
+            container.appendChild(previewBox);
+
+            const downloadDiv = document.createElement("div");
+            downloadDiv.className = "download-container";
+
+            const download = document.createElement("a");
+            download.href = `http://localhost:5000/${file}`;
+            download.textContent = "📥 Download File";
+            download.className = "download-btn";
+            download.download = true;
+
+            downloadDiv.appendChild(download);
 
             if (isAdmin) {
-              const deleteBtn = document.createElement("button");
-              deleteBtn.textContent = "🗑️ Delete";
-              deleteBtn.style.marginLeft = "10px";
-              deleteBtn.style.backgroundColor = "#dc3545";
-              deleteBtn.style.color = "#fff";
-              deleteBtn.style.padding = "6px 12px";
-              deleteBtn.style.border = "none";
-              deleteBtn.style.borderRadius = "6px";
-              deleteBtn.style.cursor = "pointer";
-
-              deleteBtn.onclick = () => {
-                if (confirm("Are you sure you want to delete this file?")) {
-                  fetch("http://localhost:5000/delete", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      branch,
-                      semester,
-                      subject,
-                      filename: file.split("/").pop()
-                    })
-                  })
-                  .then(res => res.json())
-                  .then(result => {
-                    if (result.status === "success") {
-                      alert("✅ File deleted");
-                      loadFiles();
-                    } else {
-                      alert("❌ Failed to delete");
-                    }
-                  });
-                }
-              };
-
-              card.appendChild(deleteBtn);
+              const del = document.createElement("button");
+              del.className = "delete-btn";
+              del.textContent = "🗑 Delete File";
+              del.onclick = () => deleteFile(file.split("/").pop());
+              downloadDiv.appendChild(del);
             }
 
-            list.appendChild(card);
+            container.appendChild(downloadDiv);
+            list.appendChild(container);
           });
         });
     }
 
     loadFiles();
   </script>
+
 </body>
 </html>

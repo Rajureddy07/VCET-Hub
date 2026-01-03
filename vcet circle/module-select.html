@@ -4,9 +4,61 @@
   <meta charset="UTF-8">
   <title>Select Module</title>
   <link rel="stylesheet" href="style.css">
+  
+  <style>
+    /* Home button styling - top right */
+    .home-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      padding: 10px 16px;
+      font-size: medium;
+      width: 120px;
+      background-color: #00d4ff;
+      color: black;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .home-btn:hover {
+      background-color: #00a8cc;
+    }
+    /* Mobile Responsive Fix */
+@media (max-width: 600px) {
+
+  /* Make header text & spacing adjust */
+  header {
+    font-size: 1.4rem;
+    padding: 12px 10px;
+  }
+
+  /* Home button becomes smaller + stays inside */
+  .top-btn {
+    width: 90px;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    right: 10px;
+  }
+
+  /* Back button becomes flexible */
+  .back-button {
+    font-size: 1rem;
+    width: 20%;
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+}
+
+  </style>
 </head>
 <body>
-  <h1>Select Module</h1>
+  <h1 style="background-color: black;color: white;">Select Module</h1>
+
+  <!-- Home Button -->
+  <button class="home-btn" onclick="window.location.href='index.html'"> Home</button>
+
   <div class="card-container" id="module-list"></div>
 
   <script>
@@ -26,6 +78,7 @@
       list.appendChild(a);
     }
   </script>
+
   <button class="back-button" onclick="history.back()">⬅ Back</button>
 
 </body>

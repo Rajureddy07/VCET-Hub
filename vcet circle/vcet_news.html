@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VCET News</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    background: #111;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  h1 {
+    margin-top: 20px;
+    font-size: 2rem;
+    color: #00d4ff;
+  }
+
+  /* ======== Slider Container ======== */
+  .slider {
+    width: 90%;
+    max-width: 700px;
+    height: 380px;
+    margin: 40px auto;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .slides {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    transition: transform 0.8s ease;
+  }
+
+  .slide {
+    min-width: 100%;
+    height: 100%;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ======== Upload Box — Admin Only ======== */
+  #uploadBox {
+    margin-top: 25px;
+    display: none;
+  }
+
+  #uploadBox input {
+    padding: 10px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 10px;
+    color: #fff;
+  }
+
+  #uploadBox button {
+    padding: 10px 15px;
+    background: #00d4ff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-weight: 600;
+  }
+
+  /* Delete button under slider */
+  .delete-btn {
+    background: red;
+    color: #fff;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 10px;
+    margin-top: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>VCET News</h1>
+
+<!-- Auto Slider -->
+<div class="slider">
+  <div class="slides" id="slides"></div>
+</div>
+
+<button class="delete-btn" id="deleteBtn" onclick="deleteImage()">Delete Current Image</button>
+
+<!-- Upload Section (Admin only) -->
+<div id="uploadBox">
+  <input type="file" id="newsImage">
+  <button onclick="uploadImage()">Upload</button>
+</div>
+
+<script>
+  let currentIndex = 0;
+  let images = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("adminToken");
+
+    // Show upload + delete buttons only for admin
+    if (token) {
+      document.getElementById("uploadBox").style.display = "block";
+      document.getElementById("deleteBtn").style.display = "inline-block";
+    }
+
+    loadImages();
+  });
+
+  function loadImages() {
+    fetch("http://localhost:5000/get-news")
+      .then(res => res.json())
+      .then(data => {
+        images = data.images;
+        renderSlides();
+        startSlider();
+      });
+  }
+
+  function renderSlides() {
+    const slidesContainer = document.getElementById("slides");
+    slidesContainer.innerHTML = "";
+
+    images.forEach(img => {
+      slidesContainer.innerHTML += `
+        <div class="slide">
+          <img src="http://localhost:5000/news/${img}">
+        </div>
+      `;
+    });
+  }
+
+  function startSlider() {
+    setInterval(() => {
+      if (images.length === 0) return;
+      currentIndex = (currentIndex + 1) % images.length;
+      document.getElementById("slides").style.transform =
+        `translateX(-${currentIndex * 100}%)`;
+    }, 4000);
+  }
+
+  function uploadImage() {
+    const file = document.getElementById("newsImage").files[0];
+    if (!file) return alert("Select an image first!");
+
+    const token = localStorage.getItem("adminToken");
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    fetch("http://localhost:5000/upload-news", {
+      method: "POST",
+      headers: { "Authorization": token },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(() => {
+      alert("Uploaded Successfully!");
+      loadImages();
+    });
+  }
+
+  function deleteImage() {
+    const token = localStorage.getItem("adminToken");
+    if (!token) return;
+
+    fetch("http://localhost:5000/delete-news", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": token
+      },
+      body: JSON.stringify({ index: currentIndex })
+    })
+    .then(res => res.json())
+    .then(() => {
+      alert("Image Deleted!");
+      loadImages();
+    });
+  }
+</script>
+
+</body>
+</html>

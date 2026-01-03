@@ -1,0 +1,3 @@
+Important questions for Module 1:
+1. Explain the difference between stack and queue.
+2. Describe Dijkstra’s shortest path algorithm.

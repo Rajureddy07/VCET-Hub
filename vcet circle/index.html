@@ -1,17 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>VCET Circle - Main Menu</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>VCET Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    background: linear-gradient(135deg, rgb(239, 237, 237), white);
+    color: #f0f0f0;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  header {
+    background-color: black;
+    color: #00d4ff;
+    padding: 25px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 1px solid #333;
+    width: 100%;
+    height: 40px;
+    position: relative;
+  }
+
+  .card-container {
+    display: grid;
+    grid-template-columns: 200px 200px;
+    gap: 100px;
+    justify-content: center;
+    margin-top: 50px;
+  }
+
+  .card {
+    background: #1f1f1f;
+    color: #fff;
+    width: 180px;
+    height: 180px;
+    border-radius: 18px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.6),
+                inset 0 0 10px rgba(255,255,255,0.05);
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 25px rgba(0, 212, 255, 0.5),
+                inset 0 0 12px rgba(0, 212, 255, 0.2);
+    background: #292929;
+  }
+
+  .card span {
+    font-size: 3rem;
+    margin-bottom: 12px;
+  }
+
+  .admin-btn {
+    position: absolute;
+    bottom: 1px;
+    right: 20px;
+    padding: 8px 14px;
+    background: #0e0e0e;
+    color: #fff;
+    border-radius: 18px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  #logoutBtn {
+    position: absolute;
+    top: 20px;
+    right: 140px;
+    padding: 8px 14px;
+    background: #1f1f1f;
+    color: #fff;
+    border-radius: 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: none;
+  }
+
+  .chatbot {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    padding: 22px;
+    text-align: center;
+  }
+
+  .footer-section {
+      background: #111;
+      padding: 40px 20px;
+      font-family: 'Poppins', sans-serif;
+      color: black;
+      border-top: 2px solid white;
+      width: 100%;
+      margin-top: 60px;
+  }
+
+  .footer-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+      max-width: 1300px;
+      margin: auto;
+  }
+
+  .footer-box {
+      flex: 1;
+      min-width: 250px;
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+  }
+
+  .footer-title {
+      background: repeating-linear-gradient(45deg, white, white 10px, white 10px, white 20px);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+  }
+
+  .footer-box a {
+      display: block;
+      color: #ffffff;
+      font-size: 15px;
+      margin-bottom: 10px;
+      text-decoration: none;
+      transition: 0.2s;
+  }
+
+  .footer-box a:hover {
+      color: #00eaff;
+      margin-left: 5px;
+  }
+
+  .social-icons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 15px;
+  }
+
+  .social-icons img {
+      width: 45px;
+      height: 45px;
+      cursor: pointer;
+      transition: 0.3s;
+  }
+
+  .footer-bottom {
+      text-align: center;
+      margin-top: 10px;
+      padding: 15px;
+      border-top: 1px solid #333;
+      color: #ccc;
+      height: 0.1px;
+      font-size: 15px;
+  }
+
+  /* --------------------------------------------------
+     RESPONSIVE FOR MOBILE & TABS (ONLY ADDED THIS)
+     -------------------------------------------------- */
+  
+  @media (max-width: 1024px) {
+    .card-container {
+      gap: 40px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    header {
+      height: 100px;
+    }
+    header div {
+      font-size: 3rem !important;
+      top: 15px !important;
+    }
+    .card-container {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+
+    /* Title smaller */
+    header div {
+      font-size: 2.5rem !important;
+      top: 18px !important;
+    }
+
+    /* Buttons smaller */
+    .card-container {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      width: 140px;
+      height: 140px;
+      font-size: 1rem;
+    }
+
+    .card span {
+      font-size: 2.2rem;
+    }
+
+    /* Chatbot also small */
+    .chatbot {
+      width: 90px;
+      height: 90px;
+      bottom: 15px;
+      right: 15px;
+    }
+
+    /* Footer adjust */
+    .footer-title {
+      font-size: 17px;
+    }
+    .footer-box {
+      padding: 15px;
+    }
+    .social-icons img {
+      width: 35px;
+    }
+  }
+
+</style>
 </head>
+
 <body>
-  <h1>🎓 VCET Circle</h1>
-  <div class="card-container">
-    <a class="card" href="branch.html?section=Notes">📘 Notes</a>
-    <a class="card" href="branch.html?section=Lab Manuals">🧪 Lab Manuals</a>
-    <a class="card" href="branch.html?section=Question Papers">📝 Question Papers</a>
-    <a class="card" href="branch.html?section=Internal Papers">📄 Internal Papers</a>
+
+<header>
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 25px;">
+
+      <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: 4rem; font-weight: 900; color: #00d4ff;">
+          VCET Hub
+      </div>
+
+      <a href="admin.html" class="admin-btn" id="adminLoginBtn">Login</a>
+      <button id="logoutBtn">Logout</button>
+
   </div>
+</header>
+
+
+<div class="card-container">
+  <a href="branch.html?section=Notes" class="card"><span>📚</span>Notes</a>
+  <a href="branch.html?section=Internal Papers" class="card"><span>📝</span>Internal Papers</a>
+</div>
+
+<div class="card-container">
+  <a href="branch.html?section=Lab Manuals" class="card"><span>🧪</span>Lab Manuals</a>
+  <a href="branch.html?section=Question Papers" class="card"><span>📄</span>Question Papers</a>
+</div>
+
+<div class="card-container">
+  <a href="sgpa.html" class="card"><span>📊</span>SGPA Calculator</a>
+  <a href="cgpa.html" class="card" target="_blank"><span>📈</span>CGPA Calculator</a>
+</div>
+
+<a href="chatbot.html" class="card chatbot"><span>💬</span>Chatbot</a>
+
+
+<!-- FOOTER -->
+<div class="footer-section">
+
+    <div class="footer-container">
+
+        <div class="footer-box">
+            <div class="footer-title">VTU Updates</div>
+            <a href="https://results.vtu.ac.in/" target="_blank">VTU Results</a>
+            <a href="https://vtu.ac.in/en/category/time-table/" target="_blank">VTU Exam Time Table</a>
+            <a href="https://vtu.ac.in/academic-calendar/" target="_blank">VTU Academic Calendar</a>
+            
+        </div>
+
+        <div class="footer-box">
+            <div class="footer-title">About VCET Hub</div>
+            <a href="faq.html">FAQ</a>
+            <a href="aboutus.html">About Us</a>
+            <a href="disclaimer.html">Disclaimer</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+
+        <div class="footer-box">
+            <div class="footer-title">Follow Us</div>
+            <div class="social-icons">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png">
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+         © 2025 VCET Hub
+    </div>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const isAdmin = localStorage.getItem("admin");
+
+  if (isAdmin === "true") {
+    document.getElementById("logoutBtn").style.display = "inline-block";
+    document.getElementById("adminLoginBtn").style.display = "none";
+  }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("admin");
+  alert("Logged out successfully!");
+  window.location.reload();
+});
+</script>
+
 </body>
 </html>

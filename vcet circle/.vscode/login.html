@@ -1,0 +1,41 @@
+this login.html update it
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Admin Login</h1>
+  <div class="card-container" style="max-width: 400px; margin:auto;">
+    <input type="text" id="username" placeholder="Username" class="card">
+    <input type="password" id="password" placeholder="Password" class="card">
+    <button class="card" onclick="login()">Login</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      fetch("http://localhost:5000/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          localStorage.setItem("adminToken", data.token);
+          alert("✅ Login successful");
+          window.location.href = "index.html";
+        } else {
+          document.getElementById("status").textContent = "❌ Invalid credentials";
+        }
+      });
+    }
+  </script>
+</body>
+</html>

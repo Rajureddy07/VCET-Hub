@@ -1,6 +1,9 @@
+/* =======================
+   Base Styling
+   ======================= */
 body {
   font-family: Arial, sans-serif;
-  background: #f4f4f8;
+  background: #0f0f10;
   margin: 0;
   padding: 20px;
   text-align: center;
@@ -8,10 +11,13 @@ body {
 
 h1 {
   font-size: 1.8em;
-  color: #333;
+  color: #0077cc;
   margin-bottom: 20px;
 }
 
+/* =======================
+   Cards and Containers
+   ======================= */
 .card-container {
   display: flex;
   flex-direction: column;
@@ -21,7 +27,7 @@ h1 {
 }
 
 .card {
-  background-color: #ffffff;
+  background-color: #0a0909;
   border: 2px solid #0077cc;
   padding: 15px 25px;
   border-radius: 12px;
@@ -42,6 +48,9 @@ h1 {
   transform: translateY(-3px);
 }
 
+/* =======================
+   Image & PDF Styling
+   ======================= */
 img {
   max-width: 100%;
   height: auto;
@@ -49,32 +58,119 @@ img {
   margin-bottom: 10px;
 }
 
-iframe {
+/* 🔹 Increased PDF height and styling */
+.preview-pdf {
   width: 100%;
-  border: none;
-  border-radius: 8px;
+  height: 90vh !important;   /* increased height */
+  min-height: 750px !important;
+  border: 1px solid #333;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  background: #111;
+  overflow: hidden;
+}
+
+/* 🔹 Image Preview (nice scaling) */
+.preview-image {
+  max-width: 100%;
+  max-height: 85vh;
+  border-radius: 12px;
+  object-fit: contain;
   margin-bottom: 10px;
 }
 
-.download-btn {
+/* =======================
+   Buttons
+   ======================= */
+.download-btn,
+.btn-download {
   display: inline-block;
   margin-top: 10px;
-  padding: 10px 15px;
-  background-color: #28a745;
+  padding: 10px 18px;
+  background-color: #0077cc;
   color: white;
   font-weight: bold;
   border-radius: 6px;
-  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.download-btn:hover {
-  background-color: #218838;
+.download-btn:hover,
+.btn-download:hover {
+  background-color: #005fa3;
 }
 
-.hidden {
-  display: none;
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
+.btn-delete:hover {
+  background-color: #b02a37;
+}
+
+/* =======================
+   Upload Section
+   ======================= */
+.upload-section {
+  margin: 20px auto;
+  text-align: center;
+}
+
+.upload-section input[type="file"] {
+  background: #1e1e1e;
+  color: white;
+  border: 1px solid #0077cc;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 10px;
+}
+
+.upload-section button {
+  background-color: #0077cc;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.upload-section button:hover {
+  background-color: #005fa3;
+}
+
+/* =======================
+   Uploaded Files Section
+   ======================= */
+.uploaded-card {
+  background-color: #111;
+  border: 1px solid #0077cc;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px auto;
+  max-width: 900px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 119, 204, 0.3);
+}
+
+.uploaded-filename {
+  color: #00bfff;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* =======================
+   Back Button
+   ======================= */
 .back-button {
   position: fixed;
   bottom: 20px;
@@ -93,7 +189,16 @@ iframe {
   background-color: #005fa3;
 }
 
-/* ✅ LAB MANUAL View (Optional Targeted Styling) */
+/* =======================
+   Hidden Class
+   ======================= */
+.hidden {
+  display: none;
+}
+
+/* =======================
+   Lab Manual Page Style
+   ======================= */
 .lab-manual .card-container {
   max-width: 600px;
   margin: 0 auto;
@@ -113,7 +218,34 @@ iframe {
   transform: scale(1.02);
 }
 
-/* 📱 Responsive for mobile */
+/* =======================
+   Preview Box for Converted Text
+   ======================= */
+.preview-box {
+  width: 100%;
+  max-width: 300px;
+  height: 350px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+}
+
+.preview-box iframe,
+.preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: none;
+}
+
+/* =======================
+   Responsive Styles
+   ======================= */
 @media (max-width: 600px) {
   h1 {
     font-size: 1.5em;
@@ -129,12 +261,45 @@ iframe {
     padding: 8px 12px;
   }
 
-  iframe {
-    height: 250px;
+  .preview-pdf {
+    height: 60vh !important; /* smaller on mobile */
   }
 
   .back-button {
     font-size: 13px;
     padding: 8px 14px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .card-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .card, .file-box {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  iframe, img {
+    width: 100% !important;
+    height: auto;
+  }
+
+  input, button, .download-btn {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .back-button {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
   }
 }

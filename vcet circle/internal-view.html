@@ -3,133 +3,234 @@
 <head>
   <meta charset="UTF-8">
   <title>Internal Papers</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #050505; color: #e0e0e0; }
+    h1 { text-align: center; margin-bottom: 20px; background: #161616; padding: 12px; border-radius: 8px; }
+
+    .section-title {
+      margin-top: 30px;
+      text-align: center;
+      background:  #222;
+     
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .file-box {
+      border: 2px solid white;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      background: #161616;
+      color: black;
+    }
+
+    .preview-box {
+      border: 3px solid white;
+      border-radius: 8px;
+      background: #f9f9f9;
+      width: 100%;
+      max-width: 500px;
+      max-height: 70vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      margin: 0 auto 12px auto;
+    }
+
+    .preview-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    canvas {
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      max-width: 90%;
+      height: auto;
+      display: block;
+    }
+
+    .download-container { text-align: center; margin-top: 12px; }
+    .download-btn {
+      padding: 10px 20px;
+      background: #007BFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .download-btn:hover { background: #0056b3; }
+
+    .delete-btn {
+      margin-top: 6px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #dc3545;
+      color: white;
+      margin-left: 10px;
+    }
+
+    .back-button {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      background: #6c757d;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .hidden { display: none !important; }
+    .upload-controls { text-align: center; margin-bottom: 20px; }
+    select, button, input[type="file"] { margin: 5px; padding: 8px; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
 </head>
 <body>
-  <h1 id="title">Loading...</h1>
+  <h1 id="title">Internal Papers</h1>
 
-  <div id="uploadSection" class="hidden">
-    <input type="file" id="fileInput">
-    <select id="categorySelect">
-      <option value="Internal-Papers 1">Internal-Papers 1</option>
-      <option value="Internal-Papers 2">Internal-Papers 2</option>
+  <!-- Upload section (only for Admin) -->
+  <div id="uploadSection" class="hidden upload-controls">
+    <select id="paperType">
+      <option value="Internal1">First Internals</option>
+      <option value="Internal2">Second Internals</option>
     </select>
+    <input type="file" id="fileInput">
     <button onclick="uploadFile()">Upload</button>
-    <p id="uploadStatus"></p>
   </div>
 
-  <div class="card-container" id="fileList"></div>
+  <!-- Sections -->
+  <div id="internal1">
+    <div class="section-title">First Internals</div>
+    
+    <div id="fileList_Internal1"></div>
+  </div>
+
+  <div id="internal2">
+    <div class="section-title">Second Internals</div>
+    <div id="fileList_Internal2"></div>
+  </div>
+
   <button class="back-button" onclick="history.back()">⬅ Back</button>
 
   <script>
-    const isAdmin = true;
-
     const url = new URLSearchParams(window.location.search);
-    const branch = url.get("branch");
-    const semester = url.get("semester");
-    const subject = url.get("subject");
+    const branch = url.get("branch"),
+          semester = url.get("semester"),
+          subject = url.get("subject");
 
-    const categories = [
-      "Internal-Papers 1",
-      "Internal-Papers 2"
-    ];
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    if (isAdmin) document.getElementById("uploadSection").classList.remove("hidden");
 
-    document.getElementById("title").textContent = `${subject} - Internal Papers`;
-
-    if (isAdmin) {
-      document.getElementById("uploadSection").classList.remove("hidden");
-    }
-
+    // ---------------- FILE UPLOAD ----------------
     function uploadFile() {
-      const file = document.getElementById("fileInput").files[0];
-      const module = document.getElementById("categorySelect").value;
-      if (!file) return alert("❌ Select a file");
+      const fileInput = document.getElementById("fileInput");
+      const paperType = document.getElementById("paperType").value;
+      if (!fileInput.files.length) return alert("⚠ Please choose a file before uploading!");
+      if (!confirm("✅ Do you want to upload this file to " + paperType + "?")) return;
 
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", fileInput.files[0]);
       formData.append("branch", branch);
       formData.append("semester", semester);
       formData.append("subject", subject);
-      formData.append("module", module);
+      formData.append("module", paperType);
 
-      fetch("http://localhost:5000/upload", {
-        method: "POST",
-        body: formData
-      }).then(res => res.json()).then(data => {
-        if (data.url) {
-          alert("✅ Upload successful");
+      fetch("http://localhost:5000/upload", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || "✅ File uploaded successfully!");
+          fileInput.value = "";
           loadFiles();
-        } else {
-          alert("❌ Upload failed");
+        })
+        .catch(err => alert("❌ Upload error: " + err.message));
+    }
+
+    // ---------------- PDF RENDER ----------------
+    function renderPDF(url, container) {
+      const pdfjsLib = window['pdfjs-dist/build/pdf'];
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js";
+      container.innerHTML = "";
+      pdfjsLib.getDocument(url).promise.then(pdfDoc => {
+        for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+          pdfDoc.getPage(pageNum).then(page => {
+            const viewport = page.getViewport({ scale: 1.2 }),
+                  canvas = document.createElement("canvas"),
+                  ctx = canvas.getContext("2d");
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            page.render({ canvasContext: ctx, viewport: viewport })
+              .promise.then(() => container.appendChild(canvas));
+          });
         }
       });
     }
 
+    // ---------------- DELETE FILE ----------------
+    function deleteFile(paperType, filename) {
+      if (!confirm("⚠ Delete this file?")) return;
+      fetch("http://localhost:5000/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ branch, semester, subject, module: paperType, filename })
+      })
+      .then(res => res.json())
+      .then(data => { alert(data.message); loadFiles(); });
+    }
+
+    // ---------------- LOAD FILES ----------------
     function loadFiles() {
-      const container = document.getElementById("fileList");
-      container.innerHTML = "";
-
-      categories.forEach(module => {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `<strong>${module}</strong><br>`;
-
-        fetch(`http://localhost:5000/images?branch=${branch}&semester=${semester}&subject=${subject}&module=${module}`)
+      ["Internal1", "Internal2"].forEach(type => {
+        fetch(`http://localhost:5000/images?branch=${branch}&semester=${semester}&subject=${subject}&module=${type}`)
           .then(res => res.json())
           .then(files => {
+            const list = document.getElementById(`fileList_${type}`);
+            list.innerHTML = "";
             if (files.length === 0) {
-              div.innerHTML += "<p>📭 No files uploaded.</p>";
-            } else {
-              files.forEach(file => {
-                const fileType = file.split(".").pop().toLowerCase();
-                const fileName = file.split("/").pop();
-
-                if (["jpg", "jpeg", "png", "gif"].includes(fileType)) {
-                  const img = document.createElement("img");
-                  img.src = `http://localhost:5000/${file}`;
-                  div.appendChild(img);
-                } else if (fileType === "pdf") {
-                  const iframe = document.createElement("iframe");
-                  iframe.src = `http://localhost:5000/${file}`;
-                  iframe.height = "300px";
-                  div.appendChild(iframe);
-                }
-
-                const a = document.createElement("a");
-                a.href = `http://localhost:5000/${file}`;
-                a.download = true;
-                a.className = "download-btn";
-                a.textContent = "📥 Download";
-                div.appendChild(a);
-
-                if (isAdmin) {
-                  const delBtn = document.createElement("button");
-                  delBtn.textContent = "🗑️ Delete";
-                  delBtn.style.marginLeft = "10px";
-                  delBtn.onclick = () => {
-                    fetch("http://localhost:5000/delete", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        branch, semester, subject, module,
-                        filename: fileName
-                      })
-                    }).then(res => res.json()).then(result => {
-                      if (result.status === "success") {
-                        alert("✅ File deleted");
-                        loadFiles();
-                      } else {
-                        alert("❌ Delete failed");
-                      }
-                    });
-                  };
-                  div.appendChild(delBtn);
-                }
-              });
+              list.textContent = "📭 No files uploaded yet.";
+              return;
             }
-          });
+            files.forEach(entry => {
+              const file = entry.file;
+              const container = document.createElement("div"); container.className = "file-box";
+              const previewBox = document.createElement("div"); previewBox.className = "preview-box";
+              const previewContent = document.createElement("div"); previewContent.className = "preview-content";
 
-        container.appendChild(div);
+              const fileType = file.split('.').pop().toLowerCase();
+              if (["jpg","jpeg","png","gif"].includes(fileType)) {
+                const img = document.createElement("img"); img.src = `http://localhost:5000/${file}`; previewContent.appendChild(img);
+              } else if (fileType === "pdf") {
+                renderPDF(`http://localhost:5000/${file}`, previewContent);
+              }
+
+              previewBox.appendChild(previewContent); container.appendChild(previewBox);
+
+              const downloadDiv = document.createElement("div"); downloadDiv.className = "download-container";
+              const downloadLink = document.createElement("a"); downloadLink.href = `http://localhost:5000/${file}`;
+              downloadLink.textContent = "📥 Download"; downloadLink.className = "download-btn"; downloadLink.download = true;
+              downloadDiv.appendChild(downloadLink);
+
+              if (isAdmin) {
+                const delBtn = document.createElement("button"); delBtn.className = "delete-btn"; delBtn.textContent = "🗑 Delete File";
+                delBtn.onclick = () => deleteFile(type, file.split("/").pop());
+                downloadDiv.appendChild(delBtn);
+              }
+
+              container.appendChild(downloadDiv); list.appendChild(container);
+            });
+          });
       });
     }
 

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>VTU SGPA Calculator</title>
+
+<!-- jsPDF and AutoTable libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+  body{font-family:Segoe UI,Roboto,Arial;margin:0;background:#f8fafc;padding:28px}
+  .container{max-width:1000px;margin:auto;background:#fff;padding:24px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+  h1{text-align:center;color:#12347a;margin:0 0 20px}
+  label{display:block;font-weight:600;margin-top:12px}
+  select,input{width:100%;padding:8px;border:1px solid #d6d9df;border-radius:6px;margin-top:6px}
+  table{width:100%;border-collapse:collapse;margin-top:16px}
+  th,td{border:1px solid #e8ebef;padding:8px;text-align:center}
+  th{background:#f1f5f9}
+  button{display:block;margin:20px auto 0;padding:10px 18px;border-radius:8px;background:#2563eb;color:#fff;border:none;font-weight:700;cursor:pointer}
+  button:hover{background:#1d4ed8}
+  .result{text-align:center;margin-top:16px;font-weight:700}
+</style>
+</head>
+<body>
+  <a href="index.html" style="
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  background: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  z-index: 999;
+">
+⬅ Home
+</a>
+
+  <div class="container">
+    <h1>VTU SGPA Calculator — 2022 Scheme</h1>
+
+    <label for="branch">Branch</label>
+    <select id="branch" onchange="loadSubjects()">
+      <option value="CSE">CSE - Computer Science & Engineering</option>
+      <option value="AI">AI - Artificial Intelligence</option>
+      <option value="ECE">ECE - Electronics & Communication Eng.</option>
+      <option value="ME">ME - Mechanical Eng.</option>
+      <option value="CE">CE - Civil Eng.</option>
+      <option value="DS">DS - Data Science</option>
+    </select>
+
+    <label for="semester">Semester</label>
+    <select id="semester" onchange="loadSubjects()">
+      <option value="sem1">1st Semester</option>
+      <option value="sem2">2nd Semester</option>
+      <option value="sem3">3rd Semester</option>
+      <option value="sem4">4th Semester</option>
+      <option value="sem5">5th Semester</option>
+      <option value="sem6">6th Semester</option>
+      <option value="sem7">7th Semester</option>
+      <option value="sem8">8th Semester</option>
+    </select>
+
+    <table id="subjectsTable" aria-live="polite">
+      <thead><tr><th>Subject Code</th><th>Credits</th><th>Marks (out of 100)</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <button onclick="calculateSGPA()">Calculate SGPA</button>
+    <div id="out" class="result"></div>
+    <button onclick="downloadResult()">Download Result (PDF)</button>
+  </div>
+
+<script>
+
+/* ------------------ SUBJECT DATA (same as your original) ------------------ */
+const subjectData = {
+  CSE: {
+    sem1: [["BMATC101",4],["BPHYC102",4],["BCHES103",3],["BEGDL104",3],["BEGEL105",2],["BCSL106",1]],
+    sem2: [["BMATC201",4],["BPHYC202",4],["BCHES203",3],["BEGDL204",3],["BEGEL205",2],["BCSL206",1]],
+    sem3: [["BCS301",4],["BCS302",4],["BCS303",3],["BCS304",3],["BCSL305",2],["BSCK307",1]],
+    sem4: [["BCS401",4],["BCS402",4],["BCS403",3],["BCSL404",2],["BBOC407",1],["BUHK408",1]],
+    sem5: [["BCS501",3],["BCS502",4],["BCS503",4],["BCSL504",2],["BCSP505",1]],
+    sem6: [["BCS601",3],["BCS602",4],["BCSL603",2],["BCSP604",2],["BCSP605",1]],
+    sem7: [["BCS701",3],["BCS702",4],["BCSP703",2],["BCSP704",1]],
+    sem8: [["BCS801",3],["BCS802",3],["BCSP803",8]]
+  },
+
+  AI: {
+    sem1: [["BMATC101",4],["BPHYC102",4],["BCHES103",3],["BEGDL104",3],["BEGEL105",2],["BAIL106",1]],
+    sem2: [["BMATC201",4],["BPHYC202",4],["BCHES203",3],["BEGDL204",3],["BEGEL205",2],["BAIL206",1]],
+    sem3: [["BAI301",4],["BAI302",4],["BAI303",3],["BAI304",3],["BAIL305",2],["BSCK307",1]],
+    sem4: [["BAI401",4],["BAI402",4],["BAI403",3],["BAIL404",2],["BBOC407",1],["BUHK408",1]],
+    sem5: [["BAI501",3],["BAI502",4],["BAI503",4],["BAIL504",2],["BAI505",1]],
+    sem6: [["BAI601",3],["BAI602",4],["BAIL603",2],["BAIL604",2],["BAI605",1]],
+    sem7: [["BAI701",3],["BAI702",4],["BAI703",2],["BAI704",1]],
+    sem8: [["BAI801",3],["BAI802",3],["BAI803",8]]
+  },
+
+  ECE: {
+    sem1: [["BMATE101",4],["BPHYE102",4],["BCHE103",3],["BEGDL104",3],["BEGEL105",2],["BSCPL106",1]],
+    sem2: [["BMATE201",4],["BPHE202",4],["BCHE203",3],["BEGDL204",3],["BEGEL205",2],["BSCPL206",1]],
+    sem3: [["BEC301",4],["BEC302",4],["BEC303",3],["BEC304",3],["BECL305",2],["BSCK307",1]],
+    sem4: [["BEC401",4],["BEC402",4],["BEC403",3],["BECL404",2],["BBOC407",1],["BUHK408",1]],
+    sem5: [["BEC501",3],["BEC502",4],["BEC503",4],["BECL504",2],["BEC505",1]],
+    sem6: [["BEC601",3],["BEC602",4],["BECL603",2],["BECP604",2],["BEC605",1]],
+    sem7: [["BEC701",3],["BEC702",4],["BECP703",2],["BECP704",1]],
+    sem8: [["BEC801",3],["BEC802",3],["BECP803",8]]
+  },
+
+  ME: {
+    sem1: [["BMATM101",4],["BPHYM102",4],["BCHE103",3],["BEGDL104",3],["BEGEL105",2],["BSCL106",1]],
+    sem2: [["BMATM201",4],["BPHYM202",4],["BCHE203",3],["BEGDL204",3],["BEGEL205",2],["BSCL206",1]],
+    sem3: [["BME301",4],["BME302",4],["BME303",3],["BME304",3],["BMEL305",2],["BSCK307",1]],
+    sem4: [["BME401",4],["BME402",4],["BME403",3],["BMEL404",2],["BBOC407",1],["BUHK408",1]],
+    sem5: [["BME501",3],["BME502",4],["BME503",4],["BMEL504",2],["BME505",1]],
+    sem6: [["BME601",3],["BME602",4],["BMEL603",2],["BME604",2],["BME605",1]],
+    sem7: [["BME701",3],["BME702",4],["BME703",2],["BME704",1]],
+    sem8: [["BME801",3],["BME802",3],["BME803",8]]
+  },
+
+  CE: {
+    sem1: [["BMATC101",4],["BPHYC102",4],["BCHE103",3],["BEGDL104",3],["BEGEL105",2],["BSCL106",1]],
+    sem2: [["BMATC201",4],["BPHYC202",4],["BCHE203",3],["BEGDL204",3],["BEGEL205",2],["BSCL206",1]],
+    sem3: [["BCE301",4],["BCE302",4],["BCE303",3],["BCE304",3],["BCEL305",2],["BSCK307",1]],
+    sem4: [["BCE401",4],["BCE402",4],["BCE403",3],["BCEL404",2],["BBOC407",1],["BUHK408",1]],
+    sem5: [["BCE501",3],["BCE502",4],["BCE503",4],["BCEL504",2],["BCE505",1]],
+    sem6: [["BCE601",3],["BCE602",4],["BCEL603",2],["BCE604",2],["BCE605",1]],
+    sem7: [["BCE701",3],["BCE702",4],["BCE703",2],["BCE704",1]],
+    sem8: [["BCE801",3],["BCE802",3],["BCE803",8]]
+  },
+
+  DS: {
+    sem1: [["BMATC101",4],["BPHYC102",4],["BCHES103",3],["BEGDL104",3],["BEGEL105",2],["BSCPL106",1]],
+    sem2: [["BMATC201",4],["BPHYC202",4],["BCHES203",3],["BEGDL204",3],["BEGEL205",2],["BSCPL206",1]],
+    sem3: [["BDS301",4],["BDS302",4],["BDS303",3],["BDS304",3],["BDSL305",2],["BSCK307",1]],
+    sem4: [["BDS401",4],["BDS402",4],["BDS403",3],["BDSL404",2],["BBOC407",1],["BUHK408",1]],
+    sem5: [["BDS501",3],["BDS502",4],["BDS503",4],["BDSL504",2],["BDS505",1]],
+    sem6: [["BDS601",3],["BDS602",4],["BDSL603",2],["BDS604",2],["BDS605",1]],
+    sem7: [["BDS701",3],["BDS702",4],["BDS703",2],["BDS704",1]],
+    sem8: [["BDS801",3],["BDS802",3],["BDS803",8]]
+  }
+};
+
+let sgpaValue = 0, percValue = 0;
+
+/* ------------------ LOAD SUBJECTS ------------------ */
+function loadSubjects(){
+  const br = document.getElementById('branch').value;
+  const sem = document.getElementById('semester').value;
+  const tbody = document.querySelector('#subjectsTable tbody');
+  tbody.innerHTML = '';
+
+  const list = subjectData[br][sem] || [];
+  list.forEach(([code,credit])=>{
+    tbody.insertAdjacentHTML('beforeend',
+      `<tr>
+        <td>${code}</td>
+        <td>${credit}</td>
+        <td><input type="number" min="0" max="100" placeholder="Marks"></td>
+      </tr>`);
+  });
+}
+
+/* ------------------ MARKS TO GRADE ------------------ */
+function marksToPoint(m){
+  if(m >= 90) return 10;
+  if(m >= 80) return 9;
+  if(m >= 70) return 8;
+  if(m >= 60) return 7;
+  if(m >= 55) return 6;
+  if(m >= 50) return 5;
+  if(m >= 40) return 4;
+  return 0;
+}
+
+/* ------------------ CALCULATE SGPA (UPDATED: must fill all fields) ------------------ */
+function calculateSGPA(){
+  const rows = document.querySelectorAll('#subjectsTable tbody tr');
+
+  // CHECK: All subject marks must be entered
+  for (let r of rows) {
+    const marks = r.querySelector('input').value.trim();
+    if (marks === "" || isNaN(marks)) {
+      alert("⚠️ Please enter marks for ALL subjects before calculating SGPA.");
+      return;
+    }
+  }
+
+  let totalPts = 0, totalCred = 0;
+
+  rows.forEach(r=>{
+    const marks = parseFloat(r.querySelector('input').value);
+    const cred = parseFloat(r.children[1].textContent);
+
+    totalPts += marksToPoint(marks) * cred;
+    totalCred += cred;
+  });
+
+  sgpaValue = totalPts / totalCred;
+  percValue = (sgpaValue - 0.75) * 10;
+
+  document.getElementById('out').innerHTML =
+    `🎓 SGPA: <strong>${sgpaValue.toFixed(2)}</strong> — 📊 Percentage: <strong>${percValue.toFixed(2)}%</strong>`;
+}
+
+/* ------------------ DOWNLOAD RESULT PDF ------------------ */
+function downloadResult(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const branch = document.getElementById("branch").selectedOptions[0].text;
+  const sem = document.getElementById("semester").selectedOptions[0].text;
+  const rows = document.querySelectorAll("#subjectsTable tbody tr");
+
+  if(rows.length === 0){ alert("Please calculate SGPA first!"); return; }
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(16);
+  doc.text("VTU SGPA Report — 2022 Scheme", 55, 15);
+
+  doc.setFontSize(10);
+  doc.text(`Branch: ${branch}`, 14, 25);
+  doc.text(`Semester: ${sem}`, 14, 31);
+  doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 37);
+
+  const tableData = Array.from(rows).map(r => {
+    const code = r.children[0].innerText;
+    const cred = r.children[1].innerText;
+    const marks = r.querySelector("input").value;
+    const grade = marksToPoint(parseFloat(marks));
+    return [code, cred, marks, grade];
+  });
+
+  doc.autoTable({
+    startY: 45,
+    head: [["Subject Code", "Credits", "Marks", "Grade Point"]],
+    body: tableData,
+    theme: "grid",
+    headStyles: { fillColor: [37,99,235] }
+  });
+
+  const y = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(12);
+  doc.text(`SGPA: ${sgpaValue.toFixed(2)}`, 14, y);
+  doc.text(`Percentage: ${percValue.toFixed(2)}%`, 14, y + 8);
+
+  doc.setFontSize(9);
+  doc.text("Generated by VCET Hub", 80, 285);
+
+  doc.save("VTU_SGPA_Report.pdf");
+}
+
+loadSubjects();
+</script>
+</body>
+</html>

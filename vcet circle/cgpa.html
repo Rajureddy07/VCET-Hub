@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VTU CGPA Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 480px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 2px solid #444;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  #inputsContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 20px;
+  }
+  .semester-group {
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  input[type="number"] {
+    padding: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .buttons {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  button {
+    padding: 10px;
+    flex: 1 1 30%;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #2d89ef;
+    color: white;
+    transition: background-color 0.3s ease;
+    min-width: 100px;
+  }
+  button:hover {
+    background-color: #1b5fbd;
+  }
+  #result {
+    margin-top: 25px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+  }
+  #creatorTag {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #777;
+    font-style: italic;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 600px) {
+    #inputsContainer {
+      grid-template-columns: 1fr; /* Stack semesters vertically */
+    }
+    .buttons {
+      flex-direction: column;
+    }
+    button {
+      flex: 1 1 100%;
+      min-width: auto;
+    }
+  }
+</style>
+</head>
+<body>
+  <a href="index.html" style="
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  background: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  z-index: 999;
+">
+⬅ Home
+</a>
+
+  <h2>VTU CGPA Calculator</h2>
+
+  <div id="inputsContainer">
+    <div class="semester-group">
+      <label for="sgpa1">Semester 1:</label>
+      <input type="number" step="0.01" min="0" max="10" id="sgpa1" placeholder="0.00 - 10.00" />
+    </div>
+    <div class="semester-group">
+      <label for="sgpa2">Semester 2:</label>
+      <input type="number" step="0.01" min="0" max="10" id="sgpa2" placeholder="0.00 - 10.00" />
+    </div>
+    <div class="semester-group">
+      <label for="sgpa3">Semester 3:</label>
+      <input type="number" step="0.01" min="0" max="10" id="sgpa3" placeholder="0.00 - 10.00" />
+    </div>
+    <div class="semester-group">
+      <label for="sgpa4">Semester 4:</label>
+      <input type="number" step="0.01" min="0" max="10" id="sgpa4" placeholder="0.00 - 10.00" />
+    </div>
+    <div class="semester-group">
+      <label for="sgpa5">Semester 5:</label>
+      <input type="number" step="0.01" min="0" max="10" id="sgpa5" placeholder="0.00 - 10.00" />
+    </div>
+    <div class="semester-group">
+      <label for="sgpa6">Semester 6:</label>
+      <input type="number" step="0.01" min="0" max="10" id="sgpa6" placeholder="0.00 - 10.00" />
+    </div>
+    <div class="semester-group">
+      <label for="sgpa7">Semester 7:</label>
+      <input type="number" step="0.01" min="0" max="10" id="sgpa7" placeholder="0.00 - 10.00" />
+    </div>
+    <div class="semester-group">
+      <label for="sgpa8">Semester 8:</label>
+      <input type="number" step="0.01" min="0" max="10" id="sgpa8" placeholder="0.00 - 10.00" />
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="calculateCGPA()">Calculate</button>
+    <button onclick="resetForm()">Reset</button>
+    <button onclick="downloadResult()">Download Result (PDF)</button>
+  </div>
+
+  <div id="result"></div>
+  <div id="creatorTag">Created by VCET Hub</div>
+
+<!-- jsPDF library from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const { jsPDF } = window.jspdf;
+let lastCGPA = null;
+let lastCount = 0;
+
+function calculateCGPA() {
+  let sum = 0;
+  let count = 0;
+
+  for(let i = 1; i <= 8; i++) {
+    const input = document.getElementById(`sgpa${i}`);
+    const val = parseFloat(input.value);
+
+    if(input.value.trim() !== '') {
+      if(isNaN(val) || val < 0 || val > 10) {
+        alert(`Please enter a valid SGPA between 0 and 10 for Semester ${i}`);
+        return;
+      }
+      sum += val;
+      count++;
+    }
+  }
+
+  if(count === 0) {
+    alert('Please enter SGPA for at least one semester.');
+    return;
+  }
+
+  const cgpa = (sum / count).toFixed(2);
+  lastCGPA = cgpa;
+  lastCount = count;
+
+  document.getElementById('result').textContent = `Your CGPA based on ${count} semester(s) is: ${cgpa}`;
+}
+
+function resetForm() {
+  for(let i = 1; i <= 8; i++) {
+    document.getElementById(`sgpa${i}`).value = '';
+  }
+  document.getElementById('result').textContent = '';
+  lastCGPA = null;
+  lastCount = 0;
+}
+
+function downloadResult() {
+  if (lastCGPA === null) {
+    alert('Please calculate the CGPA first.');
+    return;
+  }
+
+  const doc = new jsPDF();
+  let y = 15;
+
+  doc.setFontSize(16);
+  doc.text('VTU CGPA Calculation Result', 105, y, null, null, 'center');
+  y += 15;
+
+  // Table setup
+  const startX = 20;
+  const tableWidth = 170;
+  const col1Width = 85;
+  const col2Width = 85;
+  const rowHeight = 10;
+
+  // Draw header
+  doc.setFontSize(12);
+  doc.rect(startX, y, tableWidth, rowHeight); // outer table border
+  doc.text('Semester', startX + 10, y + 7);
+  doc.text('SGPA', startX + col1Width + 10, y + 7);
+  y += rowHeight;
+
+  // Draw rows
+  for(let i = 1; i <= 8; i++) {
+    const input = document.getElementById(`sgpa${i}`);
+    const val = input.value.trim();
+    if(val !== '') {
+      doc.rect(startX, y, col1Width, rowHeight); // left cell
+      doc.rect(startX + col1Width, y, col2Width, rowHeight); // right cell
+      doc.text(`Semester ${i}`, startX + 10, y + 7);
+      doc.text(val, startX + col1Width + 10, y + 7);
+      y += rowHeight;
+    }
+  }
+
+  // CGPA row
+  doc.rect(startX, y, tableWidth, rowHeight);
+  doc.text(`Calculated CGPA (based on ${lastCount} semester(s))`, startX + 10, y + 7);
+  doc.text(`${lastCGPA}`, startX + col1Width + 10, y + 7);
+
+  y += rowHeight + 10;
+  doc.setFontSize(10);
+  doc.text('Generated by VCET Hub', 105, y, null, null, 'center');
+
+  doc.save('VTU_CGPA_Result.pdf');
+}
+</script>
+</body>
+</html>
