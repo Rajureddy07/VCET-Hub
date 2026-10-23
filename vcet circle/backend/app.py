@@ -1,5 +1,6 @@
 # backend_server.py
 from flask import Flask, request, jsonify, send_from_directory
+from dotenv import load_dotenv
 import os
 import uuid
 import numpy as np
@@ -21,6 +22,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # ------------------ SETUP ------------------
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
@@ -35,8 +37,8 @@ os.makedirs(TEMP_FOLDER, exist_ok=True)
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "pdf", "txt"}
 
 # ------------------ GROQ AI CONFIG ------------------
-GROQ_API_KEY = "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"
-client = Groq(api_key=GROQ_API_KEY)
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 # ------------------ AI INDEX ------------------
 INDEX_FILE = "faiss_index.bin"
@@ -569,6 +571,11 @@ def chat():
             "When users ask 'What is VCET' or 'What is VCET Hub', reply: 'Vivekananda College of Engineering and Technology, Puttur (VCET) — affiliated to VTU.' "
             "Only provide non-VTU external resources when specifically requested, and prefer official VTU/college materials where possible."
         )
+
+        if client is None:
+            return jsonify({
+                "reply": "No matching local file was found, and AI fallback is not configured. Set GROQ_API_KEY in your local environment to enable AI answers."
+            }), 503
 
         groq_response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
