@@ -1,0 +1,12 @@
+Flask
+flask-cors
+python-dotenv
+numpy
+Pillow
+pdf2image
+pytesseract
+faiss-cpu
+sentence-transformers
+groq
+requests
+beautifulsoup4
