@@ -1,85 +1,101 @@
-VCET Hub 
+# VCET Hub
 
-VCET Hub is a web platform designed for students of Vivekananda College of Engineering and Technology (VCET) to easily access academic resources such as notes, lab manuals, question papers, and internal papers.
+A student-focused academic resource portal for Vivekananda College of Engineering and Technology (VCET), Puttur. It organizes study materials and academic utilities in one place.
 
-The platform allows students to preview and download study materials, while admins can upload and manage files for each subject and module.
+> **Project status:** Student project / prototype. Review upload permissions, data handling, and deployment configuration before exposing it to a public or production environment.
 
-Features 
- Study Material Access
+## Features
 
-Students can access:
+- Browse notes, lab manuals, question papers, and internal papers.
+- Navigate resources by branch, semester, subject, and module.
+- Preview or download supported PDFs and images.
+- Admin-oriented upload and file-management pages.
+- OCR-assisted text extraction for supported scanned notes.
+- Chatbot that searches local academic resources before using an optional Groq API fallback.
+- SGPA/CGPA calculator, VTU news page, FAQs, and student-resource pages.
+- Responsive HTML/CSS/JavaScript interface.
 
-Notes
+## Project structure
 
-Lab Manuals
+```text
+VCET-Hub/
+└── vcet circle/
+    ├── index.html
+    ├── branch.html
+    ├── semester.html
+    ├── subject.html
+    ├── module-select.html
+    ├── module-view.html
+    ├── question-view.html
+    ├── internal-view.html
+    ├── lab-view.html
+    ├── sgpa.html
+    ├── cgpa.html
+    ├── chatbot.html
+    ├── script.js
+    ├── style.css
+    └── backend/
+        ├── app.py
+        ├── news.py
+        ├── requirements.txt
+        └── .env.example
+```
 
-Question Papers
+The backend provides Flask endpoints for file operations and chatbot-related workflows. It can use a local FAISS/Sentence Transformers index for relevant uploaded material, with Groq as an optional AI fallback when configured.
 
-Internal Papers
+## Run locally
 
-Materials are organized by:
+### 1. Prerequisites
 
-Branch → Semester → Subject → Module
+Install Python, Git, Tesseract OCR, and Poppler (used by PDF conversion). The Sentence Transformers / FAISS stack may download model files on first use and can require substantial disk space.
 
-File Preview & Download
+### 2. Install backend dependencies
 
-Users can:
+From the repository root:
 
-Preview PDFs and images directly in the browser
+```powershell
+cd "vcet circle/backend"
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
 
-Download files for offline study
+On macOS/Linux, activate with `source .venv/bin/activate`.
 
- Admin Upload System
+### 3. Configure the optional AI fallback
 
-Admin users can:
+Copy `.env.example` to `.env` inside `vcet circle/backend`, then set `GROQ_API_KEY` to a **newly generated key**. Keep the real `.env` file private. Local-resource lookup can still work without this key, but AI fallback responses will be unavailable.
 
-Upload notes, PDFs, and images
+**Security notice:** a Groq key was previously committed in the public repository. It has been removed from the current source, but deleting a secret in a later commit does not remove it from Git history. Revoke the exposed key in Groq immediately. If needed, clean repository history before distributing further clones.
 
-Convert handwritten notes into text
+### 4. Start the backend
 
-Delete uploaded files
+In the backend directory:
 
-Manage materials for each subject/module
+```powershell
+python app.py
+```
 
-Admin upload option is hidden from normal users.
+The Flask application starts on port `5000` in the current code. Keep it limited to local development until authentication, upload validation, secret handling, and deployment settings have been reviewed.
 
-Handwritten Notes → Text Converter
+### 5. Serve the frontend
 
-Using Tesseract OCR, the system can:
+Open a second terminal at the `vcet circle` directory and run a simple local static server:
 
-Convert handwritten notes (image or PDF)
+```powershell
+python -m http.server 8080
+```
 
-Extract text
+Then open http://localhost:8080. Some frontend pages call the backend on localhost; run both processes while testing. The separate news endpoint in `backend/news.py` may be started independently if you are working on the news-upload feature.
 
-Save converted text as a file
+## Responsible use and development notes
 
- Comment System
+- Treat OCR output as unverified text; inspect important results manually.
+- Never upload private student information, credentials, or sensitive documents to a public repository.
+- Avoid committing real uploads, local logs, API keys, and generated caches.
+- The current code is a learning prototype. A hidden admin link alone is not authentication or access control.
+- Validate file uploads, apply authorization to administrative endpoints, and configure CORS and debug mode before any non-local deployment.
 
-Students can:
+## Author
 
-Add comments under each module
-
-Share doubts or suggestions
-
-View other users’ comments
-
-Reference Links
-
-Admin can add helpful resources such as:
-
-YouTube lectures
-
-Websites
-
-Additional study material links
- Mobile Responsive
-
-The website works on:
-
-Mobile devices
-
-Tablets
-
-Desktop browsers
-
-UI automatically adjusts for smaller screens.
+G. Rajasekhar Reddy · [GitHub](https://github.com/Rajureddy07)
