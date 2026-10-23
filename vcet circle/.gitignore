@@ -1,0 +1,17 @@
+# Local secrets
+.env
+.env.*
+!**/.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated / local application data
+temp_converted/
+uploads_log.pkl
