@@ -1,5 +1,7 @@
 # VCET Hub
 
+[![Python syntax](https://github.com/Rajureddy07/VCET-Hub/actions/workflows/syntax.yml/badge.svg)](https://github.com/Rajureddy07/VCET-Hub/actions/workflows/syntax.yml)
+
 A student-focused academic resource portal for Vivekananda College of Engineering and Technology (VCET), Puttur. It organizes study materials and academic utilities in one place.
 
 > **Project status:** Student project / prototype. Review upload permissions, data handling, and deployment configuration before exposing it to a public or production environment.
